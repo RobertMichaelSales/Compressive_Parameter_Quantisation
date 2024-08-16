@@ -131,16 +131,27 @@ def KMeansQuantisationSeparate(list_of_parameters,bits_per_value):
     return list_of_parameters_indices,list_of_cluster_centres
 
 #==============================================================================
+# Turn a list of matrices of parameters into low-rank approximations using SVD.
 
 def SVDParameterEncoding(list_of_parameters,target_compression_ratio):
 
-        for parameters in list_of_parameters:
-            
-            U,S,V = np.linalg.svd(parameters)
-            
-            target_size = parameters.size / target_compression_ratio
+    list_of_parameter_svd = []    
 
-       size_of_svd = R*(M+N+1)         
+    for parameters in list_of_parameters:
+        
+        U,S,V = np.linalg.svd(parameters)
+        
+        M,N = parameters.shape
+        
+        r = (M * N)//(target_compression_ratio * (M + N + 1))
+
+        U_r = U[:,:r]
+        S_r = S[:r]
+        V_r = V[:r,:]
+                    
+        list_of_parameter_svd.append((U_r,S_r,V_r))
+            
+    return list_of_parameter_svd
 
 
 #==============================================================================
